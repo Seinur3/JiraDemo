@@ -9,4 +9,5 @@ public interface IProjectService
    Task<ProjectDTO> GetByIdAsync(int id);
    Task RemoveMemberAsync(int userId, int projectId);
    Task AddMemberAsync(int userId, int projectId);
+   Task RemoveProjectAsync(int projectId,  int userId);
 }

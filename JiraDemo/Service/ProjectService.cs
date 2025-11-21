@@ -67,4 +67,21 @@ public class ProjectService : IProjectService
        }
        throw new Exception("Project not found");
     }
+
+    public async Task RemoveProjectAsync(int projectId, int userId)
+    {
+        var project = await _context.Project.FindAsync(projectId);
+        if (project == null)
+        {
+            throw new Exception("Project not found");
+        }
+
+        if (project.OwnerId != userId)
+        {
+            throw new Exception("You are not owner of this project");
+        }
+
+         _context.Project.Remove(project);
+        await _context.SaveChangesAsync();
+    }
 }

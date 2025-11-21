@@ -35,7 +35,7 @@ public class Issue
     public IssueType IssueType { get; set; } = IssueType.Task;
     public IssuePriority IssuePriority { get; set; } = IssuePriority.Medium;
     public IssueStatus IssueStatus { get; set; } = IssueStatus.Open;
-    public int AssigneeId { get; set; }
+    public int? AssigneeId { get; set; }
     public User? Assignee { get; set; }
     public int ReporterId { get; set; }
     public User? Reporter { get; set; }

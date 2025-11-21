@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication3.DTO;
 using WebApplication3.Service;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication3.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 
 public class ProjectController : ControllerBase
 {
@@ -14,9 +17,10 @@ public class ProjectController : ControllerBase
     {
         _projectService = projectService;
     }
+    private int OwnerId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateProjectAsync(ProjectCreateDTO projectCreateDto, int OwnerId)
+    public async Task<IActionResult> CreateProjectAsync(ProjectCreateDTO projectCreateDto)
     {
         try
         {
@@ -30,11 +34,12 @@ public class ProjectController : ControllerBase
         
     }
     [HttpGet("all")]
-    public async Task<IActionResult> GetAllProjectsAsync(int ownerId)
+    
+    public async Task<IActionResult> GetAllProjectsAsync()
     {
         try
         {
-            var res = await _projectService.GetAllAsync(ownerId);
+            var res = await _projectService.GetAllAsync(OwnerId);
             return Ok(res);
         }
         catch (Exception ex)
@@ -80,6 +85,20 @@ public class ProjectController : ControllerBase
             return Ok("added");
         }
         catch(Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("delete/{projectId:int}")]
+    public async Task<IActionResult> RemoveProjectAsync(int projectId)
+    {
+        try
+        {
+            await _projectService.RemoveProjectAsync(projectId, OwnerId);
+            return Ok("removed");
+        }
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
