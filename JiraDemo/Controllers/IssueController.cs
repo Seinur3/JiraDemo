@@ -16,14 +16,14 @@ public class IssueController : ControllerBase
     {
         _issueService = issueService;
     }
-    private int OwnerId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    private int reporterId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
     [HttpPost]
-    public async Task<IActionResult> CreateIssueAsync(IssueCreateDTO issueCreateDto, int projectId)
+    public async Task<IActionResult> CreateIssueAsync( [FromBody] IssueCreateDTO issueCreateDto, int projectId)
     {
         try
         {
-            var res = await _issueService.CreateIssueAsync(issueCreateDto, projectId, OwnerId);
+            var res = await _issueService.CreateIssueAsync(issueCreateDto, projectId, reporterId);
             return CreatedAtAction(nameof(CreateIssueAsync), res);
         }
         catch (Exception ex)
@@ -34,45 +34,45 @@ public class IssueController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get(int projectId)
+    public async Task<IActionResult> GetAllIssuesAsync(int projectId)
     {
         var res = await _issueService.GetAllIssuesAsync(projectId);
         return Ok(res);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{issueId}")]
+    public async Task<IActionResult> GetIssueById(int issueId)
     {
-        var res = await _issueService.GetIssueAsync(id);
+        var res = await _issueService.GetIssueAsync(issueId);
         return Ok(res);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateIssue(int id, [FromBody] IssueUpdateDTO issueUpdateDto)
+    [HttpPut("{issueId}")]
+    public async Task<IActionResult> UpdateIssueAsync(int issueId, [FromBody] IssueUpdateDTO issueUpdateDto)
     {
-        await _issueService.UpdateIssueAsync(issueUpdateDto, id);
+        await _issueService.UpdateIssueAsync(issueUpdateDto, issueId);
         return NoContent();
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> ChangeStatus(int id, [FromBody] string status)
+    [HttpPatch("{issueId}")]
+    public async Task<IActionResult> ChangeIssueStatusAsync(int issueId, [FromBody] string newStatus)
     {
-        await _issueService.ChangeIssueStatusAsync(id, status);
+        await _issueService.ChangeIssueStatusAsync(issueId, newStatus);
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    [HttpDelete("{issueId}")]
+    public async Task<IActionResult> DeleteIssueAsync(int issueId)
     {
-        await _issueService.DeleteIssueAsync(id);
+        await _issueService.DeleteIssueAsync(issueId);
         return NoContent();
         
     }
 
-    [HttpPatch("{issueid}/assignee/{id}")]
-    public async Task<IActionResult> AssigneeToIssue(int id, int issueid)
+    [HttpPatch("{issueId}/assignee/{asigneeId}")]
+    public async Task<IActionResult> AssigneeToIssue(int asigneeId, int issueId)
     {
-        await _issueService.AsignAsigneeAsync(issueid, id);
+        await _issueService.AsignAsigneeAsync(issueId, asigneeId);
         return NoContent();
     }
     
