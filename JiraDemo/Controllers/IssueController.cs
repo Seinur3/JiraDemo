@@ -12,9 +12,11 @@ namespace WebApplication3.Controllers;
 public class IssueController : ControllerBase
 {
     private readonly IIssueService _issueService;
-    public IssueController(IIssueService issueService)
+    private readonly IActivityService _activity;
+    public IssueController(IIssueService issueService, IActivityService activity)
     {
         _issueService = issueService;
+        _activity = activity;
     }
     private int reporterId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
@@ -24,6 +26,7 @@ public class IssueController : ControllerBase
         try
         {
             var res = await _issueService.CreateIssueAsync(issueCreateDto, projectId, reporterId);
+            await _activity.LogAsync(reporterId, "Issue", res.id.ToString(), "Created");
             return CreatedAtAction(nameof(CreateIssueAsync), res);
         }
         catch (Exception ex)
@@ -51,6 +54,7 @@ public class IssueController : ControllerBase
     public async Task<IActionResult> UpdateIssueAsync(int issueId, [FromBody] IssueUpdateDTO issueUpdateDto)
     {
         await _issueService.UpdateIssueAsync(issueUpdateDto, issueId);
+        await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "Updated");
         return NoContent();
     }
 
@@ -58,6 +62,7 @@ public class IssueController : ControllerBase
     public async Task<IActionResult> ChangeIssueStatusAsync(int issueId, [FromBody] string newStatus)
     {
         await _issueService.ChangeIssueStatusAsync(issueId, newStatus);
+        await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "StatusUpdated", newValue:newStatus);
         return NoContent();
     }
 
@@ -65,14 +70,16 @@ public class IssueController : ControllerBase
     public async Task<IActionResult> DeleteIssueAsync(int issueId)
     {
         await _issueService.DeleteIssueAsync(issueId);
+        await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "Deleted");
         return NoContent();
         
     }
 
     [HttpPatch("{issueId}/assignee/{asigneeId}")]
-    public async Task<IActionResult> AssigneeToIssue(int asigneeId, int issueId)
+    public async Task<IActionResult> AssigneeToIssue(int issueId, int asigneeId)
     {
         await _issueService.AsignAsigneeAsync(issueId, asigneeId);
+        await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "NewAsignee");
         return NoContent();
     }
     

@@ -2,6 +2,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using WebApplication3.Data;
@@ -20,6 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 
 
 builder.Services.AddControllers();

@@ -9,12 +9,13 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Project> Project { get; set; }
-    public DbSet<ProjectMember> ProjectMember { get; set; }
-    public DbSet<Issue> Issues { get; set; }
-    public DbSet<Comment> Comment { get; set; }
-    public DbSet<Attachment> Attachment { get; set; }
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Project> Project => Set<Project>();
+    public DbSet<ProjectMember> ProjectMember => Set<ProjectMember>();
+    public DbSet<Issue> Issues => Set<Issue>();
+    public DbSet<Comment> Comment => Set<Comment>();
+    public DbSet<Attachment> Attachment => Set<Attachment>();
+    public DbSet<ActivityLog> ActivityLog => Set<ActivityLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

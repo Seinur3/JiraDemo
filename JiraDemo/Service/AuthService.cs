@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication3.Data;
 using WebApplication3.DTO;
@@ -21,7 +22,7 @@ public class AuthService : IAuthService
     }
     public async Task<AuthResultDto> RegistrAsync(RegisterDTO register)
     {
-        if (await _context.Users.FindAsync(register.email) != null)
+        if (await _context.Users.AnyAsync(x => x.Email == register.email))
         {
             throw new Exception("Email already exists");
         }
@@ -31,9 +32,9 @@ public class AuthService : IAuthService
             FullName = register.fullname,
             Email = register.email,
             PasswordHash = hashPassword(register.password),
-            role = Role.User
+            role = "User"
         };
-        _context.Users.Add(user);
+        await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
         var token = GenerateToken(user);
@@ -103,7 +104,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.FullName),
-            new Claim(ClaimTypes.Role, user.role.ToString())
+            new Claim(ClaimTypes.Role, user.role)
         };
         var tokenDescriptor = new SecurityTokenDescriptor
         {
