@@ -10,5 +10,5 @@ public class Comment
     public int AuthorId { get; set; }
     public User? Author { get; set; }
     [Required] public string Text { get; set; } = default!;
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

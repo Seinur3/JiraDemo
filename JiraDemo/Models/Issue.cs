@@ -39,7 +39,7 @@ public class Issue
     public User? Assignee { get; set; }
     public int ReporterId { get; set; }
     public User? Reporter { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; }
     public ICollection<Comment> Comments { get; set; }
     public ICollection<Attachment> Attachments { get; set; }

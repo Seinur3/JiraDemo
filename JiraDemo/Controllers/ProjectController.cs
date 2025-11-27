@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace WebApplication3.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v2/[controller]")]
 [Authorize]
 
 public class ProjectController : ControllerBase
@@ -19,41 +19,36 @@ public class ProjectController : ControllerBase
     }
     private int OwnerId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateProjectAsync(ProjectCreateDTO projectCreateDto)
+    [HttpPost("createProject")]
+    public async Task<IActionResult> CreateProjectAsync([FromBody] ProjectCreateDTO projectCreateDto)
     {
+        if(projectCreateDto == null) return BadRequest("Data is null");
         try
         {
             var res = await _projectService.CreateProjectAsync(projectCreateDto, OwnerId);
             return Ok(res);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(e.Message);
         }
-        
     }
     [HttpGet("all")]
     
     public async Task<IActionResult> GetAllProjectsAsync()
     {
-        try
-        {
+        
             var res = await _projectService.GetAllAsync(OwnerId);
+           
             return Ok(res);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
     }
 
-    [HttpGet("id")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
         try
         {
-            var res = await _projectService.GetByIdAsync(id);
+            var res = await _projectService.GetByIdAsync(id, OwnerId);
             return Ok(res);
         }
         catch  (Exception ex)
@@ -67,7 +62,7 @@ public class ProjectController : ControllerBase
     {
         try
         {
-            await _projectService.RemoveMemberAsync(userId, projectId);
+            await _projectService.RemoveMemberAsync(userId, projectId, OwnerId);
             return Ok("removed");
         }
         catch  (Exception ex)
@@ -81,7 +76,7 @@ public class ProjectController : ControllerBase
     {
         try
         {
-            await _projectService.AddMemberAsync(userId, projectId);
+            await _projectService.AddMemberAsync(userId, projectId, OwnerId);
             return Ok("added");
         }
         catch(Exception ex)

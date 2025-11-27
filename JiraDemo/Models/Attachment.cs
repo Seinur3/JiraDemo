@@ -10,5 +10,5 @@ public class Attachment
     [Required] public string FileName { get; set; } = default!;
     [Required] public string ContentType { get; set; }= default!;
     [Required] public string FilePath { get; set; }= default!;
-    public DateTime UploadedAt { get; set; } = DateTime.Now;
+    public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 }

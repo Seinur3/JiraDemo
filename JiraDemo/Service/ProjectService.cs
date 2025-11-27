@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using WebApplication3.Data;
 using WebApplication3.DTO;
@@ -31,33 +32,44 @@ public class ProjectService : IProjectService
 
     public async Task<IEnumerable<ProjectDTO>> GetAllAsync(int ownerId)
     {
-        var projects = await _context.Project.Include(a => a.Members).Where(p => p.OwnerId == ownerId || p.Members.Any(b => b.UserId == ownerId)).ToListAsync();
-        return projects.Select(p => new ProjectDTO(p.Id, p.Name, p.Description, p.OwnerId, p.CreatedAt));
+        var project = await _context.Project.Include(x => x.Members).Where(x => x.OwnerId == ownerId || x.Members.Any(b => b.UserId==ownerId)).ToListAsync();
+        return project.Select(x => new ProjectDTO(x.Id, x.Name, x.Description, x.OwnerId, x.CreatedAt));
     }
 
-    public async Task<ProjectDTO> GetByIdAsync(int id)
+    public async Task<ProjectDTO> GetByIdAsync(int id, int ownerId)
     {
-        var p = await _context.Project.FindAsync(id);
+        var project = await _context.Project.Include(x => x.Members).Where(x => x.OwnerId == ownerId || x.Members.Any(b => b.UserId==ownerId)).ToListAsync();
+        
+        var p = project.SingleOrDefault(x => x.Id == id);
         
         if (p == null) throw new Exception("Project not found");
         return new ProjectDTO(p.Id, p.Name, p.Description, p.OwnerId, p.CreatedAt);
     }
 
-    public async Task RemoveMemberAsync(int userId, int projectId)
+    public async Task RemoveMemberAsync(int userId, int projectId, int ownerId)
     {
-        var member = await _context.ProjectMember.FindAsync(userId, projectId);
-        if (member == null)
+        var project = await _context.Project.FindAsync(projectId);
+       var member = await _context.ProjectMember.Where(x => x.ProjectId == projectId && x.UserId == userId).FirstOrDefaultAsync();
+       /*if (member == null)
+      {
+          throw new Exception("Member not found");
+      }*/
+
+        if (project.OwnerId == ownerId)
         {
-            throw new Exception("Member not found");
+            _context.ProjectMember.Remove(member);
         }
-        _context.ProjectMember.Remove(member);
+        else
+        {
+            throw new Exception("You are not the owner of this project");
+        }
         await _context.SaveChangesAsync();
     }
 
-    public async Task AddMemberAsync(int userId, int projectId)
+    public async Task AddMemberAsync(int userId, int projectId, int ownerId)
     {
        var project = await _context.Project.FindAsync(projectId);
-       if (project != null)
+       if (project != null && project.OwnerId == ownerId)
        {
            if (await _context.ProjectMember.AnyAsync(p => p.UserId == userId && p.ProjectId == projectId))
            {
