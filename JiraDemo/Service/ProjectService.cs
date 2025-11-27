@@ -38,6 +38,8 @@ public class ProjectService : IProjectService
     public async Task<ProjectDTO> GetByIdAsync(int id)
     {
         var p = await _context.Project.FindAsync(id);
+        
+        if (p == null) throw new Exception("Project not found");
         return new ProjectDTO(p.Id, p.Name, p.Description, p.OwnerId, p.CreatedAt);
     }
 

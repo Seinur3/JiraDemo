@@ -32,7 +32,7 @@ public class AuthService : IAuthService
             FullName = register.fullname,
             Email = register.email,
             PasswordHash = hashPassword(register.password),
-            role = "User"
+            Role = "User"
         };
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
@@ -104,7 +104,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.FullName),
-            new Claim(ClaimTypes.Role, user.role)
+            new Claim(ClaimTypes.Role, user.Role)
         };
         var tokenDescriptor = new SecurityTokenDescriptor
         {

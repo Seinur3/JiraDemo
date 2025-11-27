@@ -15,7 +15,7 @@ public class AttachmentService : IAttachmentService
     
     public async Task<string> SaveFile(int issueId, string fileName, string contentType, byte[] data)
     {
-        if( _context.Issues.Any(x => x.Id == issueId) == null) throw new Exception("Issue Not Found");
+        if( !_context.Issues.Any(x => x.Id == issueId)) throw new Exception("Issue Not Found");
         var folder = Path.Combine(_environment.WebRootPath?? "wwwroot", "Uploads", issueId.ToString());
         //wwwroot/Uploads/issueId/FileName
         Directory.CreateDirectory(folder);
