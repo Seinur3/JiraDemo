@@ -24,6 +24,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 
 builder.Services.AddControllers();
