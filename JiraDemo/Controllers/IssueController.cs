@@ -27,7 +27,11 @@ public class IssueController : ControllerBase
         {
             var res = await _issueService.CreateIssueAsync(issueCreateDto, projectId, reporterId);
             await _activity.LogAsync(reporterId, "Issue", res.id.ToString(), "Created");
-            return CreatedAtAction(nameof(CreateIssueAsync), res);
+            //return CreatedAtAction(nameof(CreateIssueAsync), res);
+            return CreatedAtAction(
+                nameof(GetIssueById),
+                new { projectId = projectId, issueId = res.id },
+                res);
         }
         catch (Exception ex)
         {
@@ -43,15 +47,15 @@ public class IssueController : ControllerBase
         return Ok(res);
     }
 
-    [HttpGet("{issueId}")]
-    public async Task<IActionResult> GetIssueById(int issueId)
+    [HttpGet("{issueId:int}")]
+    public async Task<IActionResult> GetIssueById(int projectId, int issueId)
     {
         var res = await _issueService.GetIssueAsync(issueId);
         return Ok(res);
     }
 
     [HttpPut("{issueId}")]
-    public async Task<IActionResult> UpdateIssueAsync(int issueId, [FromBody] IssueUpdateDTO issueUpdateDto)
+    public async Task<IActionResult> UpdateIssueAsync(int projectId, int issueId, [FromBody] IssueUpdateDTO issueUpdateDto)
     {
         await _issueService.UpdateIssueAsync(issueUpdateDto, issueId);
         await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "Updated");
@@ -59,7 +63,7 @@ public class IssueController : ControllerBase
     }
 
     [HttpPatch("{issueId}")]
-    public async Task<IActionResult> ChangeIssueStatusAsync(int issueId, [FromBody] string newStatus)
+    public async Task<IActionResult> ChangeIssueStatusAsync(int projectId, int issueId, [FromBody] string newStatus)
     {
         await _issueService.ChangeIssueStatusAsync(issueId, newStatus);
         await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "StatusUpdated", newValue:newStatus);
@@ -67,7 +71,7 @@ public class IssueController : ControllerBase
     }
 
     [HttpDelete("{issueId}")]
-    public async Task<IActionResult> DeleteIssueAsync(int issueId)
+    public async Task<IActionResult> DeleteIssueAsync(int issueId, int projectId)
     {
         await _issueService.DeleteIssueAsync(issueId);
         await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "Deleted");
@@ -76,7 +80,7 @@ public class IssueController : ControllerBase
     }
 
     [HttpPatch("{issueId}/assignee/{asigneeId}")]
-    public async Task<IActionResult> AssigneeToIssue(int issueId, int asigneeId)
+    public async Task<IActionResult> AssigneeToIssue(int issueId, int asigneeId, int projectId)
     {
         await _issueService.AsignAsigneeAsync(issueId, asigneeId);
         await _activity.LogAsync(reporterId, "Issue", issueId.ToString(), "NewAsignee");

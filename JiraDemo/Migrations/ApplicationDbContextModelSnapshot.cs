@@ -106,10 +106,7 @@ namespace WebApplication3.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("IssueId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IssuedId")
+                    b.Property<int>("IssueId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Text")
@@ -278,7 +275,9 @@ namespace WebApplication3.Migrations
 
                     b.HasOne("WebApplication3.Models.Issue", "Issue")
                         .WithMany("Comments")
-                        .HasForeignKey("IssueId");
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Author");
 

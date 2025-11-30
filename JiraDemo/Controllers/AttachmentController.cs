@@ -10,13 +10,13 @@ namespace WebApplication3.Controllers;
 
 public class AttachmentController : ControllerBase
 {
-    private readonly ActivityService _activity;
-    private readonly AttachmentService _attachment;
+    private readonly IActivityService _activity;
+    private readonly IAttachmentService _attachment;
     
-    public  AttachmentController(ActivityService activityService, AttachmentService attachmentService)
+    public  AttachmentController(IActivityService activity, IAttachmentService attachment)
     {
-        _activity = activityService;
-        _attachment = attachmentService;
+        _activity = activity;
+        _attachment = attachment;
     }
 
     [HttpPost]
