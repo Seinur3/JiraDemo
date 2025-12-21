@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3333:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_URLS=http://+:8080
+      # Use the cloud database from appsettings.json by default
+      # Or override with a local PostgreSQL:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Username=postgres;Password=postgres;Database=jiradb
+    # Uncomment to use local PostgreSQL
+    depends_on:
+      - postgres
+    networks:
+      - jira-network
+
+  # Uncomment this section if you want to use a local PostgreSQL instead of the cloud database
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jiradb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - jira-network
+
+networks:
+  jira-network:
+    driver: bridge
+
+
+volumes:
+  postgres-data:

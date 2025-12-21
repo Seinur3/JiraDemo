@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/seika/Desktop/JiraDemo/JiraDemo/JiraDemo.csproj": {}
+    "/Users/sailybaev/RiderProjects/JiraDemo/JiraDemo/JiraDemo.csproj": {}
   },
   "projects": {
-    "/Users/seika/Desktop/JiraDemo/JiraDemo/JiraDemo.csproj": {
+    "/Users/sailybaev/RiderProjects/JiraDemo/JiraDemo/JiraDemo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/seika/Desktop/JiraDemo/JiraDemo/JiraDemo.csproj",
+        "projectUniqueName": "/Users/sailybaev/RiderProjects/JiraDemo/JiraDemo/JiraDemo.csproj",
         "projectName": "JiraDemo",
-        "projectPath": "/Users/seika/Desktop/JiraDemo/JiraDemo/JiraDemo.csproj",
-        "packagesPath": "/Users/seika/.nuget/packages/",
-        "outputPath": "/Users/seika/Desktop/JiraDemo/JiraDemo/obj/",
+        "projectPath": "/Users/sailybaev/RiderProjects/JiraDemo/JiraDemo/JiraDemo.csproj",
+        "packagesPath": "/Users/sailybaev/.nuget/packages/",
+        "outputPath": "/Users/sailybaev/RiderProjects/JiraDemo/JiraDemo/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/seika/.nuget/NuGet/NuGet.Config"
+          "/Users/sailybaev/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -90,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.307/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.308/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
