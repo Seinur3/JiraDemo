@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using WebApplication3.Data;
 using WebApplication3.Service;
+using StackExchange.Redis;
+using JiraDemo.Redis;
+using IRedis = JiraDemo.Redis.IRedis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +20,14 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddSerilog();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect("localhost:6379")); //6379 otp pass redis
+    
+builder.Services.AddScoped<IRedis>(sp =>
+{
+    var mux = sp.GetRequiredService<IConnectionMultiplexer>();
+    return new RedisDb(mux.GetDatabase());
+});
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IIssueService, IssueService>();

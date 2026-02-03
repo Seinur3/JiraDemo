@@ -3,16 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication3.Data;
 using WebApplication3.DTO;
 using WebApplication3.Models;
+using JiraDemo.Redis;
+using System.Text.Json;
 
 namespace WebApplication3.Service;
 
 public class ProjectService : IProjectService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IRedis _redis;
 
-    public ProjectService(ApplicationDbContext context)
+    public ProjectService(ApplicationDbContext context, IRedis redis)
     {
         _context = context;
+        _redis = redis;
     }
 
     public async Task<ProjectDTO> CreateProjectAsync(ProjectCreateDTO project, int ownerId)
@@ -38,12 +42,19 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectDTO> GetByIdAsync(int id, int ownerId)
     {
-        var project = await _context.Project.Include(x => x.Members).Where(x => x.OwnerId == ownerId || x.Members.Any(b => b.UserId==ownerId)).ToListAsync();
+        var project = $"project:{id}:user:{ownerId}";
         
-        var p = project.SingleOrDefault(x => x.Id == id);
+        var cache = await _redis.GetAsync(project);
         
-        if (p == null) throw new Exception("Project not found");
-        return new ProjectDTO(p.Id, p.Name, p.Description, p.OwnerId, p.CreatedAt);
+        if (cache != null)
+            return JsonSerializer.Deserialize<ProjectDTO>(cache)!;
+        var prDB = await _context.Project.Include(x=>x.Members).SingleOrDefaultAsync(x => x.Id == id && (x.OwnerId == ownerId || x.Members.Any(m => m.UserId == ownerId)));
+        if (prDB == null) throw new Exception("Project not found");
+        var dto = new ProjectDTO(prDB.Id, prDB.Name, prDB.Description, prDB.OwnerId, prDB.CreatedAt);
+
+        await _redis.SetAsync(project, JsonSerializer.Serialize(dto), TimeSpan.FromMinutes(60));
+
+        return dto;
     }
 
     public async Task RemoveMemberAsync(int userId, int projectId, int ownerId)

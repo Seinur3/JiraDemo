@@ -1,16 +1,20 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WebApplication3.Data;
 using WebApplication3.DTO;
 using WebApplication3.Models;
+using JiraDemo.Redis;
 
 namespace WebApplication3.Service;
 
 public class IssueService : IIssueService
 {
     private readonly ApplicationDbContext _context;
-    public IssueService(ApplicationDbContext context)
+    private readonly IRedis _redis;
+    public IssueService(ApplicationDbContext context, IRedis redis)
     {
         _context = context;
+        _redis = redis;
     }
     public async Task<IssueDto> CreateIssueAsync(IssueCreateDTO issueCreateDTO, int projectId, int reporterId)
     {
@@ -35,12 +39,21 @@ public class IssueService : IIssueService
         var issues = await _context.Issues.Where(x => x.ProjectId == projectId).ToListAsync();
         return issues.Select(Map);
     }
-
+    
     public async Task<IssueDto> GetIssueAsync(int issueId)
     {
-        var res = await _context.Issues.FindAsync(issueId);
-        if(res == null) return null;
-        return Map(res);
+        var issue = $"issue:{issueId}";
+        
+        var cache = await _redis.GetAsync(issue);
+        
+        if (cache != null)
+            return JsonSerializer.Deserialize<IssueDto>(cache)!;
+        var isDB = await _context.Issues.FindAsync(issueId);
+        if (isDB == null) throw new Exception("Issue not found");
+        var dto = Map(isDB);
+        await _redis.SetAsync(issue, JsonSerializer.Serialize(dto), TimeSpan.FromMinutes(60));
+
+        return dto;
     }
 
     public async Task UpdateIssueAsync(IssueUpdateDTO DTO, int issueId)
