@@ -9,6 +9,7 @@ using WebApplication3.Data;
 using WebApplication3.Service;
 using StackExchange.Redis;
 using JiraDemo.Redis;
+using WebApplication3.Services;
 using IRedis = JiraDemo.Redis.IRedis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,8 @@ builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<LimitService>();
+
 
 
 builder.Services.AddControllers();

@@ -31,15 +31,9 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDTO loginDto)
     {
-        try
-        {
-            var res = await _authService.LoginAsync(loginDto);
-            return Ok(res);
-        }
-        catch(Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var result = await _authService.LoginAsync(loginDto, ip);
+        return Ok(result);
     }
     
 }

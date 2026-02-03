@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApplication3.Data;
 using WebApplication3.DTO;
 using WebApplication3.Models;
+using WebApplication3.Services;
 
 namespace WebApplication3.Service;
 
@@ -14,11 +15,14 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly LimitService _limit;
+    
 
-    public AuthService(ApplicationDbContext context, IConfiguration configuration)
+    public AuthService(ApplicationDbContext context, IConfiguration configuration,  LimitService limit)
     {
         _context = context;
         _configuration = configuration;
+        _limit = limit;
     }
     public async Task<AuthResultDto> RegistrAsync(RegisterDTO register)
     {
@@ -42,8 +46,10 @@ public class AuthService : IAuthService
 
     }
 
-    public async Task<AuthResultDto> LoginAsync(LoginDTO login)
+    public async Task<AuthResultDto> LoginAsync(LoginDTO login, string ip)
     {
+        if(await _limit.CanLogin(ip) == false)
+            throw new Exception("Too many login attempts");
         var user = _context.Users.SingleOrDefault(u => u.Email == login.email);
         if (user == null || !verifyPassword(login.password, user.PasswordHash))
         {

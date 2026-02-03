@@ -6,5 +6,5 @@ namespace WebApplication3.Service;
 public interface IAuthService
 {
     Task<AuthResultDto> RegistrAsync(RegisterDTO register);
-    Task<AuthResultDto> LoginAsync(LoginDTO login);
+    Task<AuthResultDto> LoginAsync(LoginDTO login, string ip);
 }
